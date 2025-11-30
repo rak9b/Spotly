@@ -1,19 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/Button';
-import { MapPin } from 'lucide-react';
+import { MapPin, Facebook, Globe } from 'lucide-react';
+import { ThreeDCard } from '../components/ui/ThreeDCard';
 
 export const Login = () => {
-  const { login } = useAuth();
+  const { login, loginWithProvider } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const role = searchParams.get('role') === 'guide' ? 'guide' : 'tourist';
+  const [isLoading, setIsLoading] = useState(false);
+  const [socialLoading, setSocialLoading] = useState<'google' | 'facebook' | null>(null);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    login(role);
-    navigate('/dashboard');
+    setIsLoading(true);
+    try {
+        await login(role);
+        navigate('/dashboard');
+    } finally {
+        setIsLoading(false);
+    }
+  };
+
+  const handleSocialLogin = async (provider: 'google' | 'facebook') => {
+    setSocialLoading(provider);
+    try {
+        await loginWithProvider(provider);
+        navigate('/dashboard');
+    } finally {
+        setSocialLoading(null);
+    }
   };
 
   return (
@@ -33,7 +51,7 @@ export const Login = () => {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+        <ThreeDCard className="bg-white py-8 px-4 shadow-xl sm:rounded-xl sm:px-10" depth={10}>
           <form className="space-y-6" onSubmit={handleLogin}>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -70,7 +88,7 @@ export const Login = () => {
             </div>
 
             <div>
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full" isLoading={isLoading}>
                 Sign in
               </Button>
             </div>
@@ -87,11 +105,25 @@ export const Login = () => {
             </div>
 
             <div className="mt-6 grid grid-cols-2 gap-3">
-              <Button variant="outline" className="w-full">Google</Button>
-              <Button variant="outline" className="w-full">Facebook</Button>
+              <Button 
+                variant="outline" 
+                className="w-full gap-2" 
+                onClick={() => handleSocialLogin('google')}
+                isLoading={socialLoading === 'google'}
+              >
+                <Globe className="h-4 w-4" /> Google
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full gap-2" 
+                onClick={() => handleSocialLogin('facebook')}
+                isLoading={socialLoading === 'facebook'}
+              >
+                <Facebook className="h-4 w-4" /> Facebook
+              </Button>
             </div>
           </div>
-        </div>
+        </ThreeDCard>
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import { Label } from '../components/ui/Label';
 import { api } from '../services/api';
 import { toast } from 'sonner';
 import { User, Mail, MapPin, Globe, Camera, ShieldCheck, UploadCloud } from 'lucide-react';
+import { ThreeDCard } from '../components/ui/ThreeDCard';
 
 export const Settings = () => {
   const { user } = useAuth();
@@ -67,7 +68,7 @@ export const Settings = () => {
             )}
         </div>
 
-        <div className="rounded-xl bg-white shadow-sm ring-1 ring-gray-900/5">
+        <ThreeDCard className="rounded-xl bg-white shadow-sm ring-1 ring-gray-900/5" depth={5}>
           
           {activeTab === 'profile' ? (
             <>
@@ -231,7 +232,7 @@ export const Settings = () => {
                 </div>
             </div>
           )}
-        </div>
+        </ThreeDCard>
       </div>
     </div>
   );

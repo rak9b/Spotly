@@ -95,10 +95,7 @@ export const Explore = () => {
                 <>
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {MOCK_EVENTS.map((event) => (
-                        <EventCard key={event.id} event={event as Event} />
-                    ))}
-                    {MOCK_EVENTS.map((event) => (
-                        <EventCard key={`${event.id}-duplicate`} event={{...event, id: `${event.id}-duplicate`} as Event} />
+                        <EventCard key={event.id} event={event} />
                     ))}
                     </div>
                     
@@ -107,7 +104,7 @@ export const Explore = () => {
                     </div>
                 </>
             ) : (
-                <MapCluster events={MOCK_EVENTS as Event[]} />
+                <MapCluster events={MOCK_EVENTS} />
             )}
           </div>
         </div>

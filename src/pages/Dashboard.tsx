@@ -14,6 +14,8 @@ import { BookingManagement } from '../components/booking/BookingManagement';
 import { ReviewModal } from '../components/reviews/ReviewModal';
 import { Badge } from '../components/ui/Badge';
 import { Event } from '../types';
+import { formatCurrency } from '../lib/utils';
+import { ThreeDCard } from '../components/ui/ThreeDCard';
 
 export const Dashboard = () => {
   const { user } = useAuth();
@@ -57,7 +59,7 @@ export const Dashboard = () => {
           <div className="space-y-8">
             {/* Guide Stats Grid */}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5">
+              <ThreeDCard className="overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5" depth={5}>
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-500">Total Earnings</p>
@@ -71,9 +73,9 @@ export const Dashboard = () => {
                   <TrendingUp className="mr-1 h-4 w-4" />
                   <span>+12% from last month</span>
                 </div>
-              </div>
+              </ThreeDCard>
               
-              <div className="overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5">
+              <ThreeDCard className="overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5" depth={5}>
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-500">Active Bookings</p>
@@ -84,9 +86,9 @@ export const Dashboard = () => {
                   </div>
                 </div>
                 <div className="mt-4 text-sm text-gray-500">4 pending approval</div>
-              </div>
+              </ThreeDCard>
 
-              <div className="overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5">
+              <ThreeDCard className="overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5" depth={5}>
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-500">Total Guests</p>
@@ -97,9 +99,9 @@ export const Dashboard = () => {
                   </div>
                 </div>
                 <div className="mt-4 text-sm text-gray-500">Across 5 events</div>
-              </div>
+              </ThreeDCard>
 
-              <div className="overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5">
+              <ThreeDCard className="overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5" depth={5}>
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-500">Rating</p>
@@ -110,7 +112,7 @@ export const Dashboard = () => {
                   </div>
                 </div>
                 <div className="mt-4 text-sm text-gray-500">Based on 124 reviews</div>
-              </div>
+              </ThreeDCard>
             </div>
 
             {/* Booking Management Component */}
@@ -159,8 +161,8 @@ export const Dashboard = () => {
                       </div>
                       <h4 className="font-bold text-gray-900">{MOCK_EVENTS[0].title}</h4>
                       <div className="mt-1 flex items-center gap-4 text-sm text-gray-500">
-                        <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {MOCK_EVENTS[0].startDate?.split('T')[0]}</span>
-                        <span className="flex items-center gap-1"><Map className="h-3 w-3" /> {MOCK_EVENTS[0].locationName}</span>
+                        <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {MOCK_EVENTS[0].startTime?.split('T')[0]}</span>
+                        <span className="flex items-center gap-1"><Map className="h-3 w-3" /> {MOCK_EVENTS[0].city}</span>
                       </div>
                     </div>
                     <Button variant="outline" size="sm" onClick={() => setSelectedTicket(MOCK_EVENTS[0] as Event)}>View Ticket</Button>
@@ -177,7 +179,7 @@ export const Dashboard = () => {
                       </div>
                       <h4 className="font-bold text-gray-900">{MOCK_EVENTS[2].title}</h4>
                       <div className="mt-1 flex items-center gap-4 text-sm text-gray-500">
-                        <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {MOCK_EVENTS[2].startDate?.split('T')[0]}</span>
+                        <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {MOCK_EVENTS[2].startTime?.split('T')[0]}</span>
                       </div>
                     </div>
                      <Button variant="outline" size="sm" onClick={() => setReviewEvent(MOCK_EVENTS[2].title || 'Event')}>Write Review</Button>
@@ -192,7 +194,7 @@ export const Dashboard = () => {
                   <Button variant="ghost" size="sm">Create New</Button>
                 </div>
                 <div className="p-6 grid gap-4 sm:grid-cols-2">
-                    <div className="rounded-lg border border-gray-200 p-4 hover:border-indigo-300 transition-colors cursor-pointer">
+                    <ThreeDCard className="rounded-lg border border-gray-200 p-4 hover:border-indigo-300 transition-colors cursor-pointer bg-white" depth={5}>
                         <div className="flex items-center justify-between mb-2">
                              <h4 className="font-bold text-gray-900">Tokyo Adventure</h4>
                              <span className="text-xs text-gray-500">5 Days</span>
@@ -202,7 +204,7 @@ export const Dashboard = () => {
                             <img className="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80" alt=""/>
                             <img className="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80" alt=""/>
                         </div>
-                    </div>
+                    </ThreeDCard>
                 </div>
               </div>
             </div>
@@ -217,8 +219,8 @@ export const Dashboard = () => {
                               <img src={event.images?.[0]} className="h-16 w-16 rounded-lg object-cover" />
                               <div>
                                   <h4 className="text-sm font-bold text-gray-900 line-clamp-1">{event.title}</h4>
-                                  <p className="text-xs text-gray-500">{event.locationName}</p>
-                                  <p className="text-xs font-semibold text-indigo-600 mt-1">${event.price}</p>
+                                  <p className="text-xs text-gray-500">{event.city}</p>
+                                  <p className="text-xs font-semibold text-indigo-600 mt-1">{formatCurrency(event.priceCents, event.currency)}</p>
                               </div>
                           </div>
                       ))}
@@ -235,7 +237,7 @@ export const Dashboard = () => {
                 onClose={() => setSelectedTicket(null)}
                 event={selectedTicket}
                 bookingId="bk_123456789"
-                date={selectedTicket.startDate?.split('T')[0] || 'TBD'}
+                date={selectedTicket.startTime?.split('T')[0] || 'TBD'}
                 guests={2}
             />
         )}

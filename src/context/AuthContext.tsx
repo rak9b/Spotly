@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { User, UserRole } from '../types';
-import { MOCK_USER } from '../data/mock';
 import { api } from '../services/api';
+import { toast } from 'sonner';
 
 interface AuthContextType {
   user: User | null;
   login: (role: UserRole) => Promise<void>;
+  loginWithProvider: (provider: 'google' | 'facebook') => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -18,16 +19,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (role: UserRole) => {
     // In a real app, we would call api.auth.login(credentials)
     // Here we simulate it and override the role for demo purposes
-    const userData = await api.auth.login({});
-    setUser({ ...userData, role });
+    try {
+        const userData = await api.auth.login({});
+        setUser({ ...userData, role });
+        toast.success(`Welcome back, ${userData.profile?.fullName}!`);
+    } catch (error) {
+        toast.error("Login failed. Please try again.");
+    }
+  };
+
+  const loginWithProvider = async (provider: 'google' | 'facebook') => {
+    try {
+        const userData = await api.auth.loginWithProvider(provider);
+        setUser(userData);
+        toast.success(`Welcome back, ${userData.profile?.fullName}!`);
+    } catch (error) {
+        console.error(error);
+        toast.error(`Failed to login with ${provider}`);
+        throw error;
+    }
   };
 
   const logout = () => {
     setUser(null);
+    toast.info("You have been logged out.");
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, login, loginWithProvider, logout, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   );

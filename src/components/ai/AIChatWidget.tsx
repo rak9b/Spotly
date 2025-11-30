@@ -1,23 +1,32 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, X, Send, Sparkles, Loader2, Mic, MicOff, Volume2, VolumeX, Headphones, Minimize2 } from 'lucide-react';
+import { MessageSquare, X, Send, Sparkles, Mic, MicOff, Volume2, VolumeX, Headphones, Minimize2, MapPin, Calendar, ArrowRight } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../../services/mockApi';
 import { useSpeechRecognition, useTextToSpeech } from '../../hooks/useSpeech';
-import { cn } from '../../lib/utils';
+import { cn, formatCurrency } from '../../lib/utils';
 import { VoiceOrb } from './VoiceOrb';
+import { AIResponse, AICard } from '../../types/ai.types';
+import { Event } from '../../types';
+import { ThreeDCard } from '../ui/ThreeDCard';
 
 export const AIChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isVoiceMode, setIsVoiceMode] = useState(false);
-  const [messages, setMessages] = useState<{ role: 'user' | 'ai'; text: string }[]>([
+  
+  interface Message {
+    role: 'user' | 'ai';
+    text: string;
+    cards?: AICard[];
+  }
+
+  const [messages, setMessages] = useState<Message[]>([
     { role: 'ai', text: 'Hi! I\'m your local AI assistant. Ask me anything about events, food, or hidden gems!' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Voice Hooks
   const { 
     isListening, 
     transcript, 
@@ -42,16 +51,11 @@ export const AIChatWidget = () => {
     scrollToBottom();
   }, [messages, isListening]);
 
-  // Update input with voice transcript
   useEffect(() => {
     if (transcript) {
       setInput(transcript);
     }
   }, [transcript]);
-
-  // Auto-send in Voice Mode when silence is detected (simulated by long pause or manual stop in this demo)
-  // For this MVP, we'll rely on the user clicking send or stopping the mic manually in text mode,
-  // but in Voice Mode, we can add a "Stop & Send" button.
 
   const handleSend = async (e?: React.FormEvent, overrideText?: string) => {
     e?.preventDefault();
@@ -64,45 +68,84 @@ export const AIChatWidget = () => {
     setIsLoading(true);
 
     try {
-      const response = await api.ai.chat(textToSend);
-      setMessages(prev => [...prev, { role: 'ai', text: response }]);
+      const response: AIResponse = await api.ai.chat(textToSend);
       
-      // Auto-speak response if sound is enabled OR if we are in Voice Mode
+      setMessages(prev => [...prev, { 
+        role: 'ai', 
+        text: response.reply_text,
+        cards: response.cards
+      }]);
+      
       if (isSoundEnabled || isVoiceMode) {
-        speak(response);
+        speak(response.reply_text, 'en-GB');
       }
+
     } catch (error) {
       console.error(error);
+      setMessages(prev => [...prev, { role: 'ai', text: "I'm having trouble connecting right now. Please try again later." }]);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleMicClick = () => {
-    if (isListening) {
-      stopListening();
-    } else {
-      startListening();
     }
   };
 
   const toggleVoiceMode = () => {
     setIsVoiceMode(!isVoiceMode);
     if (!isVoiceMode) {
-      // Entering voice mode: ensure sound is on
       if (!isSoundEnabled) toggleSound();
     } else {
-      // Exiting voice mode: stop listening
       if (isListening) stopListening();
     }
   };
 
-  // Determine current state for the Orb
   const getOrbState = () => {
     if (isSpeaking) return 'speaking';
     if (isLoading) return 'processing';
     if (isListening) return 'listening';
     return 'idle';
+  };
+
+  const renderCard = (card: AICard) => {
+    if (card.type === 'event') {
+      const event = card.data as Event;
+      return (
+        <ThreeDCard className="mt-3 w-full max-w-[280px] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm" depth={10}>
+          <div className="h-32 w-full bg-gray-200">
+            <img src={event.images[0]} alt={event.title} className="h-full w-full object-cover" />
+          </div>
+          <div className="p-3 bg-white">
+            <h4 className="font-bold text-gray-900 line-clamp-1">{event.title}</h4>
+            <div className="mt-1 flex items-center justify-between text-xs text-gray-500">
+              <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {event.city}</span>
+              <span className="font-bold text-indigo-600">{formatCurrency(event.priceCents, event.currency)}</span>
+            </div>
+            <Button size="sm" className="mt-3 w-full text-xs h-8">View Details</Button>
+          </div>
+        </ThreeDCard>
+      );
+    }
+    if (card.type === 'itinerary_summary') {
+      const data = card.data;
+      return (
+        <ThreeDCard className="mt-3 w-full max-w-[280px] rounded-xl border border-indigo-100 bg-indigo-50 p-4" depth={10}>
+           <div className="flex items-center gap-2 mb-2">
+              <Calendar className="h-4 w-4 text-indigo-600" />
+              <h4 className="font-bold text-indigo-900">Trip to {data.destination}</h4>
+           </div>
+           <p className="text-xs text-indigo-700 mb-3">{data.days} Days • Personalized Plan</p>
+           <div className="space-y-1 mb-3">
+              {data.highlights.map((h: string, i: number) => (
+                <div key={i} className="flex items-center gap-2 text-xs text-indigo-800">
+                   <div className="h-1.5 w-1.5 rounded-full bg-indigo-400" /> {h}
+                </div>
+              ))}
+           </div>
+           <Button size="sm" variant="secondary" className="w-full text-xs h-8 bg-indigo-600 text-white hover:bg-indigo-700">
+              View Full Itinerary <ArrowRight className="ml-1 h-3 w-3" />
+           </Button>
+        </ThreeDCard>
+      );
+    }
+    return null;
   };
 
   return (
@@ -126,7 +169,6 @@ export const AIChatWidget = () => {
                 : "bottom-20 right-4 sm:right-8 w-[350px] max-h-[600px]"
             )}
           >
-            {/* Header */}
             <div className={cn(
               "flex items-center justify-between px-4 py-3 shrink-0 transition-colors duration-300",
               isVoiceMode ? "bg-gray-900 text-white" : "bg-indigo-600 text-white"
@@ -157,19 +199,14 @@ export const AIChatWidget = () => {
               </div>
             </div>
 
-            {/* Content Area */}
             {isVoiceMode ? (
-              // --- VOICE MODE UI ---
               <div className="flex-1 flex flex-col items-center justify-center bg-gray-900 relative overflow-hidden">
-                {/* Background Ambient Light */}
                 <div className="absolute inset-0 bg-gradient-to-b from-indigo-900/20 to-gray-900 pointer-events-none" />
                 
-                {/* Orb Visualizer */}
                 <div className="relative z-10 mb-8">
                   <VoiceOrb state={getOrbState()} />
                 </div>
 
-                {/* Live Status / Transcript */}
                 <div className="relative z-10 w-full px-6 text-center space-y-4 min-h-[100px]">
                   <AnimatePresence mode="wait">
                     {isSpeaking ? (
@@ -216,9 +253,7 @@ export const AIChatWidget = () => {
                   </AnimatePresence>
                 </div>
 
-                {/* Voice Controls */}
                 <div className="relative z-10 mt-8 flex items-center gap-6">
-                   {/* Cancel / Clear */}
                    {isListening && (
                      <button 
                         onClick={resetTranscript}
@@ -228,12 +263,10 @@ export const AIChatWidget = () => {
                      </button>
                    )}
 
-                   {/* Main Mic Button */}
                    <button
                     onClick={() => {
                       if (isListening) {
                         stopListening();
-                        // If we have a transcript, send it immediately upon stopping
                         if (transcript.trim()) {
                           handleSend(undefined, transcript);
                         }
@@ -253,14 +286,13 @@ export const AIChatWidget = () => {
                 </div>
               </div>
             ) : (
-              // --- TEXT CHAT MODE UI ---
               <>
                 <div className="flex-1 overflow-y-auto bg-gray-50 p-4 min-h-[300px]">
                   <div className="space-y-4">
                     {messages.map((msg, idx) => (
                       <div
                         key={idx}
-                        className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                        className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}
                       >
                         <div
                           className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm leading-relaxed shadow-sm ${
@@ -271,6 +303,9 @@ export const AIChatWidget = () => {
                         >
                           {msg.text}
                         </div>
+                        {msg.role === 'ai' && msg.cards && msg.cards.map((card, cIdx) => (
+                          <div key={cIdx}>{renderCard(card)}</div>
+                        ))}
                       </div>
                     ))}
                     
@@ -328,7 +363,6 @@ export const AIChatWidget = () => {
         )}
       </AnimatePresence>
 
-      {/* Floating Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="fixed bottom-4 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-600 text-white shadow-lg transition-transform hover:scale-110 hover:bg-indigo-700 sm:bottom-8 sm:right-8"

@@ -1,57 +1,11 @@
-openapi: 3.0.3
+openapi: 3.0.0
 info:
-  title: Local Guide AI Platform API
-  description: API for Hybrid Events, Tours, and AI Guide SaaS.
+  title: LocalGuide.ai API
   version: 1.0.0
+  description: Comprehensive API for LocalGuide.ai platform including Events, Bookings, AI, and Wallet.
 servers:
-  - url: https://api.localguide.ai/v1
-    description: Production Server
-  - url: http://localhost:3000/api/v1
-    description: Local Development
-
-components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-
-  schemas:
-    User:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        email:
-          type: string
-          format: email
-        role:
-          type: string
-          enum: [tourist, guide, host, admin]
-    
-    Event:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        title:
-          type: string
-        description:
-          type: string
-        price_cents:
-          type: integer
-        location_city:
-          type: string
-        start_time:
-          type: string
-          format: date-time
-        images:
-          type: array
-          items:
-            type: string
-
+  - url: /api/v1
+    description: Production API
 paths:
   /auth/register:
     post:
@@ -64,26 +18,14 @@ paths:
               type: object
               required: [email, password, role]
               properties:
-                email:
-                  type: string
-                password:
-                  type: string
-                role:
-                  type: string
-                  enum: [tourist, guide]
+                email: { type: string, format: email }
+                password: { type: string, minLength: 8 }
+                role: { type: string, enum: [tourist, guide, host] }
+                firstName: { type: string }
+                lastName: { type: string }
       responses:
         '201':
           description: User created
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  token:
-                    type: string
-                  user:
-                    $ref: '#/components/schemas/User'
-
   /auth/login:
     post:
       summary: Login user
@@ -95,10 +37,8 @@ paths:
               type: object
               required: [email, password]
               properties:
-                email:
-                  type: string
-                password:
-                  type: string
+                email: { type: string }
+                password: { type: string }
       responses:
         '200':
           description: Login successful
@@ -107,69 +47,45 @@ paths:
               schema:
                 type: object
                 properties:
-                  accessToken:
-                    type: string
-                  refreshToken:
-                    type: string
-
+                  access_token: { type: string }
+                  refresh_token: { type: string }
   /events:
     get:
-      summary: Search events
+      summary: List events
       parameters:
-        - name: city
-          in: query
-          schema:
-            type: string
-        - name: date
-          in: query
-          schema:
-            type: string
-            format: date
-        - name: page
-          in: query
-          schema:
-            type: integer
-            default: 1
+        - in: query
+          name: q
+          schema: { type: string }
+        - in: query
+          name: city
+          schema: { type: string }
+        - in: query
+          name: start_date
+          schema: { type: string, format: date }
       responses:
         '200':
           description: List of events
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Event'
-                  total:
-                    type: integer
-
     post:
-      summary: Create an event (Guide only)
-      security:
-        - bearerAuth: []
+      summary: Create event
+      security: [{ bearerAuth: [] }]
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Event'
+              $ref: '#/components/schemas/EventInput'
       responses:
         '201':
           description: Event created
-
   /bookings:
     post:
-      summary: Create a booking
-      security:
-        - bearerAuth: []
+      summary: Create booking
+      security: [{ bearerAuth: [] }]
       parameters:
-        - name: Idempotency-Key
-          in: header
+        - in: header
+          name: Idempotency-Key
+          schema: { type: string }
           required: true
-          schema:
-            type: string
       requestBody:
         required: true
         content:
@@ -178,21 +94,15 @@ paths:
               type: object
               required: [event_id, seats]
               properties:
-                event_id:
-                  type: string
-                  format: uuid
-                seats:
-                  type: integer
-                  minimum: 1
+                event_id: { type: string, format: uuid }
+                seats: { type: integer, minimum: 1 }
       responses:
         '201':
-          description: Booking created (pending payment)
-
+          description: Booking created
   /ai/planner:
     post:
-      summary: Generate AI Itinerary
-      security:
-        - bearerAuth: []
+      summary: Generate itinerary
+      security: [{ bearerAuth: [] }]
       requestBody:
         required: true
         content:
@@ -200,23 +110,43 @@ paths:
             schema:
               type: object
               properties:
-                destination:
-                  type: string
-                days:
-                  type: integer
-                interests:
-                  type: array
-                  items:
-                    type: string
+                destination: { type: string }
+                dates: 
+                  type: object
+                  properties: { from: { type: string }, to: { type: string } }
+                interests: { type: array, items: { type: string } }
       responses:
         '200':
-          description: Generated itinerary
+          description: AI generated itinerary
+  /wallet:
+    get:
+      summary: Get wallet balance
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Wallet details
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  itinerary:
-                    type: array
-                    items:
-                      type: object
+                  balance_cents: { type: integer }
+                  currency: { type: string }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    EventInput:
+      type: object
+      required: [title, city, price_cents, start_time]
+      properties:
+        title: { type: string }
+        description: { type: string }
+        city: { type: string }
+        price_cents: { type: integer }
+        start_time: { type: string, format: date-time }
+        max_participants: { type: integer }
+        images: { type: array, items: { type: string } }

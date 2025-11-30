@@ -4,21 +4,37 @@ import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Label } from '../components/ui/Label';
-import { MapPin, User, Compass, Check } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { MapPin, User, Compass, Check, Globe, Facebook } from 'lucide-react';
+import { ThreeDCard } from '../components/ui/ThreeDCard';
 
 export const Register = () => {
-  const { login } = useAuth();
+  const { login, loginWithProvider } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialRole = searchParams.get('role') === 'guide' ? 'guide' : 'tourist';
   const [selectedRole, setSelectedRole] = useState<'tourist' | 'guide'>(initialRole);
+  const [isLoading, setIsLoading] = useState(false);
+  const [socialLoading, setSocialLoading] = useState<'google' | 'facebook' | null>(null);
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate registration then login
-    login(selectedRole);
-    navigate('/dashboard');
+    setIsLoading(true);
+    try {
+        await login(selectedRole);
+        navigate('/dashboard');
+    } finally {
+        setIsLoading(false);
+    }
+  };
+
+  const handleSocialLogin = async (provider: 'google' | 'facebook') => {
+    setSocialLoading(provider);
+    try {
+        await loginWithProvider(provider);
+        navigate('/dashboard');
+    } finally {
+        setSocialLoading(null);
+    }
   };
 
   return (
@@ -41,7 +57,7 @@ export const Register = () => {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-[600px]">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-xl sm:px-10">
+        <ThreeDCard className="bg-white py-8 px-4 shadow-xl sm:rounded-xl sm:px-10" depth={10}>
           
           {/* Role Selection */}
           <div className="mb-8 grid grid-cols-2 gap-4">
@@ -108,7 +124,7 @@ export const Register = () => {
               <Input id="password" type="password" required placeholder="••••••••" />
             </div>
 
-            <Button type="submit" className="w-full" size="lg">
+            <Button type="submit" className="w-full" size="lg" isLoading={isLoading}>
               Create Account
             </Button>
           </form>
@@ -124,11 +140,25 @@ export const Register = () => {
             </div>
 
             <div className="mt-6 grid grid-cols-2 gap-3">
-              <Button variant="outline" className="w-full">Google</Button>
-              <Button variant="outline" className="w-full">Facebook</Button>
+              <Button 
+                variant="outline" 
+                className="w-full gap-2"
+                onClick={() => handleSocialLogin('google')}
+                isLoading={socialLoading === 'google'}
+              >
+                <Globe className="h-4 w-4" /> Google
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full gap-2"
+                onClick={() => handleSocialLogin('facebook')}
+                isLoading={socialLoading === 'facebook'}
+              >
+                <Facebook className="h-4 w-4" /> Facebook
+              </Button>
             </div>
           </div>
-        </div>
+        </ThreeDCard>
       </div>
     </div>
   );

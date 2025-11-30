@@ -1,7 +1,11 @@
-export type UserRole = 'tourist' | 'guide' | 'admin';
-export type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'rejected';
-export type PaymentStatus = 'pending' | 'succeeded' | 'failed' | 'refunded';
-export type VerificationStatus = 'unverified' | 'pending' | 'verified' | 'rejected';
+import { Database } from './database.types';
+
+// Derived types from Database definition
+export type UserRole = Database['public']['Tables']['users']['Row']['role'];
+export type EventStatus = Database['public']['Tables']['events']['Row']['status'];
+export type BookingStatus = Database['public']['Tables']['bookings']['Row']['status'];
+export type PaymentStatus = Database['public']['Tables']['payments']['Row']['status'];
+export type VerificationStatus = 'pending' | 'verified' | 'rejected';
 
 // --- Core Entities ---
 
@@ -9,65 +13,26 @@ export interface User {
   id: string;
   email: string;
   role: UserRole;
+  isActive: boolean;
   createdAt: string;
-  lastLogin?: string;
-  profile: Profile;
-  verification?: GuideVerification; // For guides
+  // Joined Profile Data (Common pattern for frontend)
+  profile?: Profile;
   wallet?: Wallet;
 }
 
 export interface Profile {
   id: string;
   userId: string;
-  firstName: string;
-  lastName: string;
-  displayName?: string;
+  fullName: string;
   avatarUrl?: string;
   bio?: string;
   languages: string[];
   interests: string[];
-  location?: string;
-  phoneNumber?: string;
-  isPublic: boolean;
-}
-
-export interface GuideVerification {
-  id: string;
-  userId: string;
-  documentUrl: string;
-  documentType: 'passport' | 'id_card' | 'license';
-  status: VerificationStatus;
-  submittedAt: string;
-  verifiedAt?: string;
-  rejectionReason?: string;
-}
-
-// --- Wallet & Payments ---
-
-export interface Wallet {
-  id: string;
-  userId: string;
-  balance: number;
-  currency: string;
-  transactions: Transaction[];
-}
-
-export interface Transaction {
-  id: string;
-  walletId: string;
-  amount: number;
-  type: 'deposit' | 'withdrawal' | 'payment' | 'refund' | 'earning';
-  status: PaymentStatus;
-  referenceId?: string; // Booking ID or External Payment ID
-  createdAt: string;
-}
-
-export interface PaymentIntent {
-  id: string;
-  amount: number;
-  currency: string;
-  clientSecret: string;
-  provider: 'stripe' | 'sslcommerz' | 'bkash';
+  city?: string;
+  ratingAvg: number;
+  ratingCount: number;
+  timezone?: string;
+  isVerified?: boolean;
 }
 
 // --- Events & Listings ---
@@ -75,46 +40,35 @@ export interface PaymentIntent {
 export interface Event {
   id: string;
   hostId: string;
-  host: Profile; // Expanded for UI
+  host?: Profile; // Expanded for UI
+  
   title: string;
   description: string;
-  type: 'event' | 'tour';
-  category: string;
+  itinerary: ItineraryItem[]; // JSONB
   
-  // Location
-  locationName: string;
-  coordinates?: { lat: number; lng: number };
-  meetingPoint: string;
+  city: string;
+  location?: { lat: number; lng: number }; // PostGIS conversion
   
-  // Details
-  images: string[];
-  price: number;
+  startTime: string;
+  endTime?: string;
+  
+  minParticipants: number;
+  maxParticipants: number;
+  
+  priceCents: number; // Changed from price
   currency: string;
-  duration: string; // ISO 8601 duration or string description
-  maxGroupSize: number;
   
-  // Schedule
-  startDate: string;
-  endDate?: string;
-  isRecurring: boolean;
+  status: EventStatus;
+  visibility: 'public' | 'private';
+  images: string[];
   
-  // Stats
-  rating: number;
-  reviewCount: number;
-  
-  // Metadata
-  status: 'draft' | 'published' | 'cancelled' | 'completed';
-  itinerary: ItineraryItem[];
   createdAt: string;
 }
 
 export interface ItineraryItem {
-  order: number;
-  time?: string;
   title: string;
   description: string;
-  locationName?: string;
-  coordinates?: { lat: number; lng: number };
+  time?: string;
 }
 
 // --- Bookings ---
@@ -122,49 +76,54 @@ export interface ItineraryItem {
 export interface Booking {
   id: string;
   eventId: string;
-  event: Event; // Expanded for UI
+  event?: Event; // Expanded
   userId: string;
-  user: Profile; // Expanded for UI
-  
-  date: string;
-  guests: number;
-  totalPrice: number;
-  currency: string;
+  user?: Profile; // Expanded
   
   status: BookingStatus;
-  paymentStatus: PaymentStatus;
-  paymentId?: string;
+  seats: number;
+  totalCents: number;
+  currency: string;
+  paymentIntentId?: string;
   
   createdAt: string;
-  updatedAt: string;
+}
+
+// --- Wallet & Transactions ---
+
+export interface Wallet {
+  id: string;
+  userId: string;
+  balanceCents: number;
+  currency: string;
+}
+
+export interface Transaction {
+  id: string;
+  walletId: string;
+  type: 'topup' | 'payout' | 'refund' | 'commission' | 'payment';
+  amountCents: number;
+  balanceAfter: number;
+  reference?: string;
+  status: 'pending' | 'completed' | 'failed';
+  createdAt: string;
 }
 
 // --- Reviews ---
 
 export interface Review {
   id: string;
+  reviewerId: string;
+  reviewer?: Profile;
+  guideId?: string;
+  eventId?: string;
   bookingId: string;
-  eventId: string;
-  authorId: string;
-  author: Profile;
-  
-  rating: number; // 1-5
+  rating: number;
   comment: string;
-  images?: string[];
-  
   createdAt: string;
 }
 
-// --- AI Services ---
-
-export interface AIActivityLog {
-  id: string;
-  userId: string;
-  action: 'trip_plan' | 'chat' | 'recommendation';
-  inputContext: any; // JSON
-  outputResult: any; // JSON
-  createdAt: string;
-}
+// --- AI Types ---
 
 export interface AITripPlanRequest {
   destination: string;
@@ -172,4 +131,33 @@ export interface AITripPlanRequest {
   budget: 'budget' | 'moderate' | 'luxury';
   interests: string[];
   travelers: number;
+}
+
+export interface AIActivityLog {
+  id: string;
+  userId: string;
+  endpoint: 'planner' | 'recommend' | 'assistant' | 'moderation';
+  input: any;
+  output: any;
+  costMeta: any;
+  createdAt: string;
+}
+
+// --- Chat ---
+
+export interface ChatThread {
+  id: string;
+  participants: Profile[];
+  lastMessage?: ChatMessage;
+  updatedAt: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  threadId: string;
+  senderId: string;
+  content: string;
+  isTranslated?: boolean;
+  originalContent?: string;
+  createdAt: string;
 }

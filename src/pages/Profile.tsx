@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '../services/api';
 import { User, Event } from '../types';
-import { MapPin, Globe, MessageCircle, ShieldCheck, Star, Calendar } from 'lucide-react';
+import { MapPin, Globe, MessageCircle, ShieldCheck, Star } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { EventCard } from '../components/EventCard';
 import { Badge } from '../components/ui/Badge';
 import { MOCK_EVENTS } from '../data/mock';
+import { ThreeDCard } from '../components/ui/ThreeDCard';
 
 export const Profile = () => {
   const { id } = useParams();
@@ -38,7 +39,7 @@ export const Profile = () => {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Sidebar Profile Info */}
           <div className="lg:col-span-1">
-            <div className="rounded-2xl bg-white p-6 shadow-lg">
+            <ThreeDCard className="rounded-2xl bg-white p-6 shadow-lg" depth={10}>
               <div className="relative -mt-16 mb-6 flex justify-center">
                 <img 
                   src={profile.avatarUrl} 
@@ -100,18 +101,18 @@ export const Profile = () => {
                     <MessageCircle className="h-4 w-4" /> Contact Host
                 </Button>
               </div>
-            </div>
+            </ThreeDCard>
           </div>
 
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
              {/* Bio */}
-             <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-gray-900/5">
+             <ThreeDCard className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-gray-900/5" depth={5}>
                 <h2 className="text-xl font-bold text-gray-900 mb-4">About Me</h2>
                 <p className="text-gray-600 leading-relaxed">
                     {profile.bio || "Hi there! I love showing people around my city."}
                 </p>
-             </div>
+             </ThreeDCard>
 
              {/* Listings */}
              <div>
@@ -124,7 +125,7 @@ export const Profile = () => {
              </div>
 
              {/* Reviews Preview */}
-             <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-gray-900/5">
+             <ThreeDCard className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-gray-900/5" depth={5}>
                 <h2 className="text-xl font-bold text-gray-900 mb-6">Reviews</h2>
                 <div className="space-y-6">
                     {[1, 2].map((i) => (
@@ -147,7 +148,7 @@ export const Profile = () => {
                         </div>
                     ))}
                 </div>
-             </div>
+             </ThreeDCard>
           </div>
         </div>
       </div>

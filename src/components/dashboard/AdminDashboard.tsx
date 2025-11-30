@@ -3,13 +3,14 @@ import { Users, AlertTriangle, DollarSign, Activity, Check, X } from 'lucide-rea
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { AnalyticsChart } from './AnalyticsChart';
+import { ThreeDCard } from '../ui/ThreeDCard';
 
 export const AdminDashboard = () => {
   return (
     <div className="space-y-8">
         {/* Admin Stats */}
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5">
+            <ThreeDCard className="overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5" depth={5}>
                 <div className="flex items-center justify-between">
                     <div>
                         <p className="text-sm font-medium text-gray-500">Total Users</p>
@@ -19,8 +20,8 @@ export const AdminDashboard = () => {
                         <Users className="h-6 w-6" />
                     </div>
                 </div>
-            </div>
-            <div className="overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5">
+            </ThreeDCard>
+            <ThreeDCard className="overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5" depth={5}>
                 <div className="flex items-center justify-between">
                     <div>
                         <p className="text-sm font-medium text-gray-500">Platform Revenue</p>
@@ -30,8 +31,8 @@ export const AdminDashboard = () => {
                         <DollarSign className="h-6 w-6" />
                     </div>
                 </div>
-            </div>
-            <div className="overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5">
+            </ThreeDCard>
+            <ThreeDCard className="overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5" depth={5}>
                 <div className="flex items-center justify-between">
                     <div>
                         <p className="text-sm font-medium text-gray-500">Pending KYC</p>
@@ -41,8 +42,8 @@ export const AdminDashboard = () => {
                         <Activity className="h-6 w-6" />
                     </div>
                 </div>
-            </div>
-            <div className="overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5">
+            </ThreeDCard>
+            <ThreeDCard className="overflow-hidden rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5" depth={5}>
                 <div className="flex items-center justify-between">
                     <div>
                         <p className="text-sm font-medium text-gray-500">Flagged Content</p>
@@ -52,18 +53,18 @@ export const AdminDashboard = () => {
                         <AlertTriangle className="h-6 w-6" />
                     </div>
                 </div>
-            </div>
+            </ThreeDCard>
         </div>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
             {/* Platform Growth Chart */}
-            <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5">
+            <ThreeDCard className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-900/5" depth={5}>
                 <h3 className="mb-6 text-lg font-bold text-gray-900">Platform Growth</h3>
                 <AnalyticsChart />
-            </div>
+            </ThreeDCard>
 
             {/* Moderation Queue */}
-            <div className="rounded-xl bg-white shadow-sm ring-1 ring-gray-900/5">
+            <ThreeDCard className="rounded-xl bg-white shadow-sm ring-1 ring-gray-900/5" depth={5}>
                 <div className="border-b border-gray-200 px-6 py-4">
                     <h3 className="text-lg font-bold text-gray-900">Moderation Queue</h3>
                 </div>
@@ -93,7 +94,7 @@ export const AdminDashboard = () => {
                         </div>
                     ))}
                 </div>
-            </div>
+            </ThreeDCard>
         </div>
     </div>
   );

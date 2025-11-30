@@ -16,6 +16,7 @@ import ScrollToTop from './components/utils/ScrollToTop';
 import { AIChatWidget } from './components/ai/AIChatWidget';
 import { useAuth } from './context/AuthContext';
 import { Toaster } from './components/ui/Toaster';
+import { OfflineIndicator } from './components/utils/OfflineIndicator';
 
 // Simple protected route wrapper
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -30,6 +31,7 @@ function App() {
       <Router>
         <ScrollToTop />
         <div className="flex min-h-screen flex-col font-sans text-gray-900">
+          <OfflineIndicator />
           <Navbar />
           <main className="flex-1">
             <Routes>

@@ -3,6 +3,7 @@ import { Check, X, Clock, Calendar, User } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { toast } from 'sonner';
+import { ThreeDCard } from '../ui/ThreeDCard';
 
 // Mock bookings data for the guide dashboard
 const MOCK_BOOKINGS = [
@@ -18,7 +19,7 @@ export const BookingManagement = () => {
   };
 
   return (
-    <div className="rounded-xl bg-white shadow-sm ring-1 ring-gray-900/5">
+    <ThreeDCard className="rounded-xl bg-white shadow-sm ring-1 ring-gray-900/5" depth={5}>
       <div className="border-b border-gray-200 px-6 py-4">
         <h3 className="text-lg font-bold text-gray-900">Booking Requests</h3>
       </div>
@@ -64,6 +65,6 @@ export const BookingManagement = () => {
           </div>
         ))}
       </div>
-    </div>
+    </ThreeDCard>
   );
 };

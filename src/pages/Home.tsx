@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { AIPlannerWidget } from '../components/ai/AIPlannerWidget';
 import { Hero3D } from '../components/layout/Hero3D';
 import { fadeInUp, staggerContainer } from '../lib/motion';
+import { ThreeDCard } from '../components/ui/ThreeDCard';
 
 export const Home = () => {
   return (
@@ -23,7 +24,9 @@ export const Home = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <AIPlannerWidget />
+          <ThreeDCard className="rounded-2xl" depth={5}>
+            <AIPlannerWidget />
+          </ThreeDCard>
         </motion.div>
       </section>
 
@@ -56,15 +59,18 @@ export const Home = () => {
               <motion.div 
                 key={i}
                 variants={fadeInUp}
-                className="group flex flex-col items-center text-center p-8 rounded-3xl bg-white border border-gray-100 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
               >
-                <div className={`mb-6 rounded-2xl bg-${item.color}-50 p-4 text-${item.color}-600 group-hover:scale-110 transition-transform duration-300`}>
-                  <item.icon className="h-8 w-8" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900">{item.title}</h3>
-                <p className="mt-4 text-gray-600 leading-relaxed">
-                  {item.text}
-                </p>
+                <ThreeDCard className="h-full p-8 rounded-3xl bg-white border border-gray-100 shadow-sm">
+                  <div className="flex flex-col items-center text-center h-full">
+                    <div className={`mb-6 rounded-2xl bg-${item.color}-50 p-4 text-${item.color}-600`}>
+                      <item.icon className="h-8 w-8" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900">{item.title}</h3>
+                    <p className="mt-4 text-gray-600 leading-relaxed">
+                      {item.text}
+                    </p>
+                  </div>
+                </ThreeDCard>
               </motion.div>
             ))}
           </motion.div>
@@ -85,13 +91,15 @@ export const Home = () => {
               { name: 'New York', image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=600&q=80', count: '200+ Events' },
               { name: 'London', image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=600&q=80', count: '150+ Events' },
             ].map((city) => (
-              <Link key={city.name} to={`/explore?city=${city.name}`} className="group relative aspect-[3/4] overflow-hidden rounded-2xl cursor-pointer">
-                <img src={city.image} alt={city.name} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-90" />
-                <div className="absolute bottom-4 left-4 text-white transform transition-transform duration-300 group-hover:translate-x-2">
-                  <h3 className="text-xl font-bold">{city.name}</h3>
-                  <p className="text-sm text-gray-300 group-hover:text-white transition-colors">{city.count}</p>
-                </div>
+              <Link key={city.name} to={`/explore?city=${city.name}`}>
+                <ThreeDCard className="group relative aspect-[3/4] overflow-hidden rounded-2xl cursor-pointer">
+                  <img src={city.image} alt={city.name} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-90" />
+                  <div className="absolute bottom-4 left-4 text-white transform transition-transform duration-300 group-hover:translate-x-2">
+                    <h3 className="text-xl font-bold">{city.name}</h3>
+                    <p className="text-sm text-gray-300 group-hover:text-white transition-colors">{city.count}</p>
+                  </div>
+                </ThreeDCard>
               </Link>
             ))}
           </div>
@@ -135,7 +143,7 @@ export const Home = () => {
               { name: "Mike T.", role: "Foodie", text: "Kenji's tour in Tokyo was the highlight of my trip. He took us to places with no English menus—authentic and delicious.", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80" },
               { name: "Elena R.", role: "Digital Nomad", text: "I use this app in every city I visit to meet locals. The guides are professional and super friendly.", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" }
             ].map((testimonial, i) => (
-              <div key={i} className="bg-gray-50 p-8 rounded-3xl shadow-sm border border-gray-100">
+              <ThreeDCard key={i} className="bg-gray-50 p-8 rounded-3xl shadow-sm border border-gray-100" depth={5}>
                 <div className="flex gap-1 text-yellow-400 mb-4">
                   {[1,2,3,4,5].map(s => <Star key={s} className="h-4 w-4 fill-current" />)}
                 </div>
@@ -147,7 +155,7 @@ export const Home = () => {
                     <p className="text-xs text-gray-500">{testimonial.role}</p>
                   </div>
                 </div>
-              </div>
+              </ThreeDCard>
             ))}
           </div>
         </div>

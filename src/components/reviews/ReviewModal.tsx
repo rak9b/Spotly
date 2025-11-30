@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Star, X, Image as ImageIcon } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { toast } from 'sonner';
+import { ThreeDCard } from '../ui/ThreeDCard';
 
 interface ReviewModalProps {
   isOpen: boolean;
@@ -24,7 +25,7 @@ export const ReviewModal = ({ isOpen, onClose, eventName }: ReviewModalProps) =>
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+      <ThreeDCard className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl" depth={15}>
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-xl font-bold text-gray-900">Review Experience</h3>
           <button onClick={onClose} className="rounded-full p-1 hover:bg-gray-100">
@@ -78,7 +79,7 @@ export const ReviewModal = ({ isOpen, onClose, eventName }: ReviewModalProps) =>
             </Button>
           </div>
         </form>
-      </div>
+      </ThreeDCard>
     </div>
   );
 };
