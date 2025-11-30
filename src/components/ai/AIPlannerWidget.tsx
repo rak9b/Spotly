@@ -43,39 +43,39 @@ export const AIPlannerWidget = () => {
   };
 
   return (
-    <div className="rounded-2xl bg-white p-6 shadow-xl ring-1 ring-gray-900/5">
+    <div className="rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-xl ring-1 ring-gray-900/5 dark:ring-white/10">
       <div className="mb-6 flex items-center gap-2">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
           <Sparkles className="h-5 w-5" />
         </div>
         <div>
-          <h3 className="text-lg font-bold text-gray-900">AI Trip Planner</h3>
-          <p className="text-xs text-gray-500">Personalized itineraries in seconds</p>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">AI Trip Planner</h3>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Personalized itineraries in seconds</p>
         </div>
       </div>
 
       {step === 1 && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Where to?</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Where to?</label>
             <div className="relative">
               <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
               <input
                 type="text"
                 placeholder="e.g., Tokyo, Paris"
-                className="w-full rounded-lg border border-gray-300 py-2 pl-9 pr-4 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 py-2 pl-9 pr-4 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white dark:placeholder:text-gray-500"
                 value={formData.destination}
                 onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
               />
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Duration (Days)</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Duration (Days)</label>
             <input
               type="number"
               min="1"
               max="7"
-              className="w-full rounded-lg border border-gray-300 py-2 px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 py-2 px-3 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:text-white"
               value={formData.days}
               onChange={(e) => setFormData({ ...formData, days: parseInt(e.target.value) })}
             />
@@ -88,7 +88,7 @@ export const AIPlannerWidget = () => {
 
       {step === 2 && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
-          <label className="block text-sm font-medium text-gray-700">What do you like?</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">What do you like?</label>
           <div className="flex flex-wrap gap-2">
             {['Food', 'History', 'Art', 'Nature', 'Nightlife', 'Shopping'].map(interest => (
               <button
@@ -97,7 +97,7 @@ export const AIPlannerWidget = () => {
                 className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                   formData.interests.includes(interest)
                     ? 'bg-indigo-600 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                 }`}
               >
                 {interest}
@@ -117,15 +117,15 @@ export const AIPlannerWidget = () => {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
           <div className="max-h-[300px] overflow-y-auto pr-2 space-y-6">
             {result.map((day: any) => (
-              <div key={day.day} className="relative border-l-2 border-indigo-100 pl-4">
-                <h4 className="mb-2 text-sm font-bold text-indigo-600">Day {day.day}</h4>
+              <div key={day.day} className="relative border-l-2 border-indigo-100 dark:border-indigo-900 pl-4">
+                <h4 className="mb-2 text-sm font-bold text-indigo-600 dark:text-indigo-400">Day {day.day}</h4>
                 <div className="space-y-3">
                   {day.activities.map((activity: any, idx: number) => (
                     <div key={idx} className="relative">
                       <div className="absolute -left-[21px] mt-1.5 h-2.5 w-2.5 rounded-full bg-indigo-400" />
-                      <p className="text-xs font-semibold text-gray-900">{activity.time}</p>
-                      <p className="text-sm font-medium text-gray-800">{activity.title}</p>
-                      <p className="text-xs text-gray-500">{activity.description}</p>
+                      <p className="text-xs font-semibold text-gray-900 dark:text-white">{activity.time}</p>
+                      <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{activity.title}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{activity.description}</p>
                     </div>
                   ))}
                 </div>

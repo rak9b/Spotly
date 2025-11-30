@@ -15,7 +15,6 @@ export interface User {
   role: UserRole;
   isActive: boolean;
   createdAt: string;
-  // Joined Profile Data (Common pattern for frontend)
   profile?: Profile;
   wallet?: Wallet;
 }
@@ -29,6 +28,8 @@ export interface Profile {
   languages: string[];
   interests: string[];
   city?: string;
+  location?: string; // Human readable location string
+  coordinates?: { lat: number; lng: number }; // Geo coordinates
   ratingAvg: number;
   ratingCount: number;
   timezone?: string;
@@ -40,14 +41,15 @@ export interface Profile {
 export interface Event {
   id: string;
   hostId: string;
-  host?: Profile; // Expanded for UI
+  host?: Profile;
   
   title: string;
   description: string;
-  itinerary: ItineraryItem[]; // JSONB
+  itinerary: ItineraryItem[];
   
   city: string;
-  location?: { lat: number; lng: number }; // PostGIS conversion
+  location?: { lat: number; lng: number };
+  locationName?: string; // Meeting point name
   
   startTime: string;
   endTime?: string;
@@ -55,7 +57,7 @@ export interface Event {
   minParticipants: number;
   maxParticipants: number;
   
-  priceCents: number; // Changed from price
+  priceCents: number;
   currency: string;
   
   status: EventStatus;
@@ -76,9 +78,9 @@ export interface ItineraryItem {
 export interface Booking {
   id: string;
   eventId: string;
-  event?: Event; // Expanded
+  event?: Event;
   userId: string;
-  user?: Profile; // Expanded
+  user?: Profile;
   
   status: BookingStatus;
   seats: number;
@@ -121,6 +123,29 @@ export interface Review {
   rating: number;
   comment: string;
   createdAt: string;
+}
+
+// --- Notifications ---
+
+export interface Notification {
+  id: string;
+  userId: string;
+  type: 'booking_request' | 'booking_confirmed' | 'payment_success' | 'system' | 'review';
+  title: string;
+  message: string;
+  data?: any;
+  isRead: boolean;
+  createdAt: string;
+}
+
+// --- Analytics ---
+
+export interface AnalyticsOverview {
+  totalRevenue: number;
+  totalBookings: number;
+  totalViews: number;
+  conversionRate: number;
+  revenueSeries: { date: string; amount: number }[];
 }
 
 // --- AI Types ---

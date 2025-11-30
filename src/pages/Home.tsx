@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Globe, ShieldCheck, Sparkles, Star } from 'lucide-react';
+import { Globe, ShieldCheck, Sparkles, Star, Search, CalendarCheck, Map as MapIcon } from 'lucide-react';
 import { MotionButton } from '../components/ui/MotionButton';
 import { EventCard } from '../components/EventCard';
 import { MOCK_EVENTS } from '../data/mock';
@@ -12,7 +12,7 @@ import { ThreeDCard } from '../components/ui/ThreeDCard';
 
 export const Home = () => {
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
+    <div className="flex min-h-screen flex-col bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
       {/* 1. Immersive 3D Hero */}
       <Hero3D />
 
@@ -24,14 +24,43 @@ export const Home = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <ThreeDCard className="rounded-2xl" depth={5}>
+          <ThreeDCard className="rounded-2xl bg-white dark:bg-gray-900" depth={5}>
             <AIPlannerWidget />
           </ThreeDCard>
         </motion.div>
       </section>
 
-      {/* 2. Value Proposition */}
-      <section className="py-24">
+      {/* 2. How It Works (New Section) */}
+      <section className="py-24 bg-white dark:bg-gray-900 transition-colors duration-300">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">How It Works</h2>
+            <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">Your journey to authentic local experiences starts here.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
+            {/* Connector Line (Desktop) */}
+            <div className="hidden md:block absolute top-12 left-[16%] right-[16%] h-0.5 bg-gradient-to-r from-indigo-200 via-purple-200 to-indigo-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 -z-10" />
+
+            {[
+              { icon: Search, title: "1. Discover", desc: "Browse unique tours or ask our AI to plan your perfect trip." },
+              { icon: CalendarCheck, title: "2. Book", desc: "Secure your spot instantly with verified local guides." },
+              { icon: MapIcon, title: "3. Experience", desc: "Meet your guide and explore the city like a local." }
+            ].map((step, idx) => (
+              <div key={idx} className="flex flex-col items-center text-center">
+                <div className="h-24 w-24 rounded-full bg-white dark:bg-gray-800 border-4 border-indigo-50 dark:border-gray-700 flex items-center justify-center mb-6 shadow-sm z-10">
+                  <step.icon className="h-10 w-10 text-indigo-600 dark:text-indigo-400" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{step.title}</h3>
+                <p className="text-gray-600 dark:text-gray-400 max-w-xs">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 3. Value Proposition */}
+      <section className="py-24 bg-gray-50 dark:bg-gray-950">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <motion.div 
             initial="hidden"
@@ -40,8 +69,8 @@ export const Home = () => {
             variants={staggerContainer}
             className="text-center mb-16"
           >
-            <motion.h2 variants={fadeInUp} className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Why Choose LocalGuide.ai</motion.h2>
-            <motion.p variants={fadeInUp} className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">We combine human expertise with AI precision for the perfect trip.</motion.p>
+            <motion.h2 variants={fadeInUp} className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">Why Choose LocalGuide.ai</motion.h2>
+            <motion.p variants={fadeInUp} className="mt-4 text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">We combine human expertise with AI precision for the perfect trip.</motion.p>
           </motion.div>
           
           <motion.div 
@@ -60,13 +89,13 @@ export const Home = () => {
                 key={i}
                 variants={fadeInUp}
               >
-                <ThreeDCard className="h-full p-8 rounded-3xl bg-white border border-gray-100 shadow-sm">
+                <ThreeDCard className="h-full p-8 rounded-3xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-sm">
                   <div className="flex flex-col items-center text-center h-full">
-                    <div className={`mb-6 rounded-2xl bg-${item.color}-50 p-4 text-${item.color}-600`}>
+                    <div className={`mb-6 rounded-2xl bg-${item.color}-50 dark:bg-${item.color}-900/20 p-4 text-${item.color}-600 dark:text-${item.color}-400`}>
                       <item.icon className="h-8 w-8" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900">{item.title}</h3>
-                    <p className="mt-4 text-gray-600 leading-relaxed">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">{item.title}</h3>
+                    <p className="mt-4 text-gray-600 dark:text-gray-400 leading-relaxed">
                       {item.text}
                     </p>
                   </div>
@@ -77,12 +106,12 @@ export const Home = () => {
         </div>
       </section>
 
-      {/* 3. Popular Destinations */}
-      <section className="py-16 bg-white">
+      {/* 4. Popular Destinations */}
+      <section className="py-16 bg-white dark:bg-gray-900 transition-colors duration-300">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10">
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900">Popular Destinations</h2>
-            <p className="mt-2 text-gray-600">Explore the world's most exciting cities.</p>
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Popular Destinations</h2>
+            <p className="mt-2 text-gray-600 dark:text-gray-400">Explore the world's most exciting cities.</p>
           </div>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
             {[
@@ -106,15 +135,15 @@ export const Home = () => {
         </div>
       </section>
 
-      {/* 4. Trending Events */}
-      <section className="py-24 bg-gray-50">
+      {/* 5. Trending Events */}
+      <section className="py-24 bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 flex items-end justify-between">
             <div>
-              <h2 className="text-3xl font-bold tracking-tight text-gray-900">Trending Experiences</h2>
-              <p className="mt-2 text-gray-600">Top-rated tours and events happening soon.</p>
+              <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Trending Experiences</h2>
+              <p className="mt-2 text-gray-600 dark:text-gray-400">Top-rated tours and events happening soon.</p>
             </div>
-            <Link to="/explore" className="hidden text-sm font-semibold text-indigo-600 hover:text-indigo-500 sm:block">
+            <Link to="/explore" className="hidden text-sm font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 sm:block">
               View all <span aria-hidden="true">→</span>
             </Link>
           </div>
@@ -133,26 +162,26 @@ export const Home = () => {
         </div>
       </section>
 
-      {/* 5. Testimonials */}
-      <section className="py-24 bg-white border-t border-gray-100">
+      {/* 6. Testimonials */}
+      <section className="py-24 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 transition-colors duration-300">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold tracking-tight text-center text-gray-900 mb-16">What Travelers Say</h2>
+          <h2 className="text-3xl font-bold tracking-tight text-center text-gray-900 dark:text-white mb-16">What Travelers Say</h2>
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
             {[
               { name: "Sarah J.", role: "Solo Traveler", text: "The AI itinerary was a game changer. It found a jazz bar I would never have discovered on my own!", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80" },
               { name: "Mike T.", role: "Foodie", text: "Kenji's tour in Tokyo was the highlight of my trip. He took us to places with no English menus—authentic and delicious.", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80" },
               { name: "Elena R.", role: "Digital Nomad", text: "I use this app in every city I visit to meet locals. The guides are professional and super friendly.", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" }
             ].map((testimonial, i) => (
-              <ThreeDCard key={i} className="bg-gray-50 p-8 rounded-3xl shadow-sm border border-gray-100" depth={5}>
+              <ThreeDCard key={i} className="bg-gray-50 dark:bg-gray-800 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700" depth={5}>
                 <div className="flex gap-1 text-yellow-400 mb-4">
                   {[1,2,3,4,5].map(s => <Star key={s} className="h-4 w-4 fill-current" />)}
                 </div>
-                <p className="text-gray-600 mb-6 italic leading-relaxed">"{testimonial.text}"</p>
+                <p className="text-gray-600 dark:text-gray-300 mb-6 italic leading-relaxed">"{testimonial.text}"</p>
                 <div className="flex items-center gap-4">
-                  <img src={testimonial.avatar} alt={testimonial.name} className="h-12 w-12 rounded-full object-cover ring-2 ring-white" />
+                  <img src={testimonial.avatar} alt={testimonial.name} className="h-12 w-12 rounded-full object-cover ring-2 ring-white dark:ring-gray-700" />
                   <div>
-                    <h4 className="font-bold text-gray-900">{testimonial.name}</h4>
-                    <p className="text-xs text-gray-500">{testimonial.role}</p>
+                    <h4 className="font-bold text-gray-900 dark:text-white">{testimonial.name}</h4>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{testimonial.role}</p>
                   </div>
                 </div>
               </ThreeDCard>
@@ -161,7 +190,7 @@ export const Home = () => {
         </div>
       </section>
 
-      {/* 6. CTA Section */}
+      {/* 7. CTA Section */}
       <section className="relative overflow-hidden bg-indigo-600 py-24">
         <div className="absolute inset-0 opacity-10">
             <svg className="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">

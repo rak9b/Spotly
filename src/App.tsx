@@ -17,6 +17,7 @@ import { AIChatWidget } from './components/ai/AIChatWidget';
 import { useAuth } from './context/AuthContext';
 import { Toaster } from './components/ui/Toaster';
 import { OfflineIndicator } from './components/utils/OfflineIndicator';
+import { SpotlightEffect } from './components/ui/SpotlightEffect';
 
 // Simple protected route wrapper
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -30,10 +31,13 @@ function App() {
     <AuthProvider>
       <Router>
         <ScrollToTop />
-        <div className="flex min-h-screen flex-col font-sans text-gray-900">
+        <div className="flex min-h-screen flex-col font-sans text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
+          {/* Global Spotlight Effect */}
+          <SpotlightEffect />
+          
           <OfflineIndicator />
           <Navbar />
-          <main className="flex-1">
+          <main className="flex-1 relative z-10">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/explore" element={<Explore />} />
@@ -52,6 +56,14 @@ function App() {
                 } 
               />
               <Route 
+                path="/dashboard/*" 
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
                 path="/settings" 
                 element={
                   <ProtectedRoute>
@@ -61,6 +73,14 @@ function App() {
               />
               <Route 
                 path="/create-listing" 
+                element={
+                  <ProtectedRoute>
+                    <CreateListing />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/edit-listing/:id" 
                 element={
                   <ProtectedRoute>
                     <CreateListing />

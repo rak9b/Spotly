@@ -68,7 +68,8 @@ export const Settings = () => {
             )}
         </div>
 
-        <ThreeDCard className="rounded-xl bg-white shadow-sm ring-1 ring-gray-900/5" depth={5}>
+        {/* Disable tilt on forms */}
+        <ThreeDCard className="rounded-xl bg-white shadow-sm ring-1 ring-gray-900/5" depth={5} enableTilt={false}>
           
           {activeTab === 'profile' ? (
             <>

@@ -57,7 +57,8 @@ export const Register = () => {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-[600px]">
-        <ThreeDCard className="bg-white py-8 px-4 shadow-xl sm:rounded-xl sm:px-10" depth={10}>
+        {/* Disable tilt on forms to prevent input focus loss */}
+        <ThreeDCard className="bg-white py-8 px-4 shadow-xl sm:rounded-xl sm:px-10" depth={10} enableTilt={false}>
           
           {/* Role Selection */}
           <div className="mb-8 grid grid-cols-2 gap-4">

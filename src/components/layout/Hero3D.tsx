@@ -2,8 +2,9 @@ import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { MorphButton } from '../ui/MorphButton';
-import { Sparkles, MapPin, Star, Search } from 'lucide-react';
+import { Sparkles, MapPin, Star, Search, Mic } from 'lucide-react';
 import { TRANSITION_SLOW, fadeInUp, staggerContainer } from '../../lib/motion';
+import { triggerAI } from '../../lib/events';
 
 export const Hero3D = () => {
   const ref = useRef(null);
@@ -114,11 +115,12 @@ export const Hero3D = () => {
                 Start Exploring
               </MorphButton>
             </Link>
-            <Link to="/register?role=guide">
-              <button className="inline-flex h-12 min-w-[180px] items-center justify-center rounded-xl border border-white/30 bg-white/5 px-6 font-medium text-white backdrop-blur-sm transition-all hover:bg-white/10 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-gray-900">
-                Become a Guide
-              </button>
-            </Link>
+            <button 
+              onClick={() => triggerAI.startVoiceMode()}
+              className="inline-flex h-12 min-w-[180px] items-center justify-center gap-2 rounded-xl border border-white/30 bg-white/5 px-6 font-medium text-white backdrop-blur-sm transition-all hover:bg-white/10 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-gray-900"
+            >
+              <Mic className="h-4 w-4" /> Ask AI Guide
+            </button>
           </motion.div>
         </motion.div>
       </div>

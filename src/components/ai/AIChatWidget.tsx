@@ -9,6 +9,7 @@ import { VoiceOrb } from './VoiceOrb';
 import { AIResponse, AICard } from '../../types/ai.types';
 import { Event } from '../../types';
 import { ThreeDCard } from '../ui/ThreeDCard';
+import { AI_EVENTS } from '../../lib/events';
 
 export const AIChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -42,6 +43,24 @@ export const AIChatWidget = () => {
     toggleSound,
     isSpeaking
   } = useTextToSpeech();
+
+  // Listen for global events
+  useEffect(() => {
+    const handleOpen = () => setIsOpen(true);
+    const handleVoiceMode = () => {
+      setIsOpen(true);
+      setIsVoiceMode(true);
+      if (!isListening) startListening();
+    };
+
+    window.addEventListener(AI_EVENTS.OPEN_CHAT, handleOpen);
+    window.addEventListener(AI_EVENTS.START_VOICE_MODE, handleVoiceMode);
+
+    return () => {
+      window.removeEventListener(AI_EVENTS.OPEN_CHAT, handleOpen);
+      window.removeEventListener(AI_EVENTS.START_VOICE_MODE, handleVoiceMode);
+    };
+  }, [isListening, startListening]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -91,8 +110,10 @@ export const AIChatWidget = () => {
   const toggleVoiceMode = () => {
     setIsVoiceMode(!isVoiceMode);
     if (!isVoiceMode) {
+      // Entering voice mode
       if (!isSoundEnabled) toggleSound();
     } else {
+      // Exiting voice mode
       if (isListening) stopListening();
     }
   };
@@ -108,15 +129,15 @@ export const AIChatWidget = () => {
     if (card.type === 'event') {
       const event = card.data as Event;
       return (
-        <ThreeDCard className="mt-3 w-full max-w-[280px] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm" depth={10}>
-          <div className="h-32 w-full bg-gray-200">
+        <ThreeDCard className="mt-3 w-full max-w-[280px] overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm" depth={10}>
+          <div className="h-32 w-full bg-gray-200 dark:bg-gray-700">
             <img src={event.images[0]} alt={event.title} className="h-full w-full object-cover" />
           </div>
-          <div className="p-3 bg-white">
-            <h4 className="font-bold text-gray-900 line-clamp-1">{event.title}</h4>
-            <div className="mt-1 flex items-center justify-between text-xs text-gray-500">
+          <div className="p-3 bg-white dark:bg-gray-800">
+            <h4 className="font-bold text-gray-900 dark:text-white line-clamp-1">{event.title}</h4>
+            <div className="mt-1 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
               <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {event.city}</span>
-              <span className="font-bold text-indigo-600">{formatCurrency(event.priceCents, event.currency)}</span>
+              <span className="font-bold text-indigo-600 dark:text-indigo-400">{formatCurrency(event.priceCents, event.currency)}</span>
             </div>
             <Button size="sm" className="mt-3 w-full text-xs h-8">View Details</Button>
           </div>
@@ -126,15 +147,15 @@ export const AIChatWidget = () => {
     if (card.type === 'itinerary_summary') {
       const data = card.data;
       return (
-        <ThreeDCard className="mt-3 w-full max-w-[280px] rounded-xl border border-indigo-100 bg-indigo-50 p-4" depth={10}>
+        <ThreeDCard className="mt-3 w-full max-w-[280px] rounded-xl border border-indigo-100 dark:border-indigo-900/50 bg-indigo-50 dark:bg-indigo-900/20 p-4" depth={10}>
            <div className="flex items-center gap-2 mb-2">
-              <Calendar className="h-4 w-4 text-indigo-600" />
-              <h4 className="font-bold text-indigo-900">Trip to {data.destination}</h4>
+              <Calendar className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+              <h4 className="font-bold text-indigo-900 dark:text-indigo-200">Trip to {data.destination}</h4>
            </div>
-           <p className="text-xs text-indigo-700 mb-3">{data.days} Days • Personalized Plan</p>
+           <p className="text-xs text-indigo-700 dark:text-indigo-300 mb-3">{data.days} Days • Personalized Plan</p>
            <div className="space-y-1 mb-3">
               {data.highlights.map((h: string, i: number) => (
-                <div key={i} className="flex items-center gap-2 text-xs text-indigo-800">
+                <div key={i} className="flex items-center gap-2 text-xs text-indigo-800 dark:text-indigo-200">
                    <div className="h-1.5 w-1.5 rounded-full bg-indigo-400" /> {h}
                 </div>
               ))}
@@ -163,7 +184,7 @@ export const AIChatWidget = () => {
             }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             className={cn(
-              "fixed z-50 overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-gray-900/5 flex flex-col transition-all duration-500 ease-in-out",
+              "fixed z-50 overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl ring-1 ring-gray-900/5 dark:ring-white/10 flex flex-col transition-all duration-500 ease-in-out",
               isVoiceMode 
                 ? "bottom-4 right-4 sm:bottom-8 sm:right-8 h-[600px] w-[90vw] sm:w-[400px]" 
                 : "bottom-20 right-4 sm:right-8 w-[350px] max-h-[600px]"
@@ -287,7 +308,7 @@ export const AIChatWidget = () => {
               </div>
             ) : (
               <>
-                <div className="flex-1 overflow-y-auto bg-gray-50 p-4 min-h-[300px]">
+                <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-4 min-h-[300px]">
                   <div className="space-y-4">
                     {messages.map((msg, idx) => (
                       <div
@@ -298,7 +319,7 @@ export const AIChatWidget = () => {
                           className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm leading-relaxed shadow-sm ${
                             msg.role === 'user'
                               ? 'bg-indigo-600 text-white rounded-br-none'
-                              : 'bg-white text-gray-800 rounded-bl-none border border-gray-100'
+                              : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-bl-none border border-gray-100 dark:border-gray-700'
                           }`}
                         >
                           {msg.text}
@@ -311,7 +332,7 @@ export const AIChatWidget = () => {
                     
                     {isLoading && (
                       <div className="flex justify-start">
-                        <div className="flex items-center gap-1 rounded-2xl rounded-bl-none bg-white px-4 py-2 shadow-sm border border-gray-100">
+                        <div className="flex items-center gap-1 rounded-2xl rounded-bl-none bg-white dark:bg-gray-800 px-4 py-2 shadow-sm border border-gray-100 dark:border-gray-700">
                           <div className="h-2 w-2 animate-bounce rounded-full bg-indigo-400" style={{ animationDelay: '0ms' }} />
                           <div className="h-2 w-2 animate-bounce rounded-full bg-indigo-400" style={{ animationDelay: '150ms' }} />
                           <div className="h-2 w-2 animate-bounce rounded-full bg-indigo-400" style={{ animationDelay: '300ms' }} />
@@ -322,13 +343,13 @@ export const AIChatWidget = () => {
                   </div>
                 </div>
 
-                <form onSubmit={(e) => handleSend(e)} className="border-t border-gray-200 bg-white p-3 shrink-0">
+                <form onSubmit={(e) => handleSend(e)} className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3 shrink-0">
                   <div className="flex gap-2 items-end">
                     <div className="relative flex-1">
                       <input
                         type="text"
                         placeholder="Ask for recommendations..."
-                        className="w-full rounded-2xl border border-gray-300 px-4 py-2.5 pr-10 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                        className="w-full rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2.5 pr-10 text-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 dark:text-white dark:placeholder:text-gray-500"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         disabled={isLoading}
@@ -337,7 +358,7 @@ export const AIChatWidget = () => {
                         <button
                           type="button"
                           onClick={toggleVoiceMode}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-gray-400 hover:bg-gray-100 hover:text-indigo-600"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-indigo-600"
                           title="Switch to Voice Mode"
                         >
                           <Mic className="h-4 w-4" />
@@ -348,7 +369,7 @@ export const AIChatWidget = () => {
                       size="sm" 
                       className={cn(
                         "rounded-full h-10 w-10 p-0 shrink-0 transition-all",
-                        input.trim() ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-300 hover:bg-gray-400"
+                        input.trim() ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600"
                       )} 
                       disabled={isLoading || !input.trim()}
                       type="submit"

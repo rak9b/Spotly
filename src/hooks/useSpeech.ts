@@ -81,7 +81,14 @@ export const useSpeechRecognition = () => {
 
       recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
         console.error('Speech recognition error', event.error);
-        setError(event.error);
+        // Handle specific error cases for better user feedback
+        if (event.error === 'not-allowed') {
+          setError('Microphone access denied. Please allow permissions in browser settings.');
+        } else if (event.error === 'no-speech') {
+          setError('No speech detected. Please try again.');
+        } else {
+          setError(event.error);
+        }
         setIsListening(false);
       };
 
@@ -93,6 +100,13 @@ export const useSpeechRecognition = () => {
     } else {
       setError('Speech recognition not supported in this browser.');
     }
+
+    // Cleanup function to abort recognition on unmount
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
+    };
   }, []);
 
   const startListening = useCallback(() => {
@@ -156,6 +170,15 @@ export const useTextToSpeech = () => {
       synth.onvoiceschanged = loadVoices;
     }
   }, [synth]);
+
+  // Cleanup speech synthesis on unmount
+  useEffect(() => {
+    return () => {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   const speak = useCallback((text: string, language: VoiceLanguage = 'en-GB') => {
     if (!isEnabled || !synth) return;

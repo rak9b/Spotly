@@ -46,12 +46,15 @@ export const Login = () => {
           {role === 'guide' ? 'Partner Login' : 'Welcome back'}
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
-          Or <a href="/register" className="font-medium text-indigo-600 hover:text-indigo-500">create a new account</a>
+          Or <a href="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
+            create a new account
+          </a>
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <ThreeDCard className="bg-white py-8 px-4 shadow-xl sm:rounded-xl sm:px-10" depth={10}>
+        {/* Disable tilt on forms to prevent input focus loss */}
+        <ThreeDCard className="bg-white py-8 px-4 shadow-xl sm:rounded-xl sm:px-10" depth={10} enableTilt={false}>
           <form className="space-y-6" onSubmit={handleLogin}>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">

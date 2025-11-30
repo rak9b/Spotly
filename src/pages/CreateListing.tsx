@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Label } from '../components/ui/Label';
-import { UploadCloud, Plus, Trash2, MapPin, DollarSign, Clock, Users } from 'lucide-react';
+import { MapPin, DollarSign, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../services/api';
 import { ThreeDCard } from '../components/ui/ThreeDCard';
 
 export const CreateListing = () => {
   const navigate = useNavigate();
+  const { id } = useParams(); // Check for ID to enable Edit Mode
+  const isEditMode = !!id;
+
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(1);
   
@@ -25,6 +28,34 @@ export const CreateListing = () => {
     itinerary: [{ title: '', description: '', time: '' }]
   });
 
+  // Fetch existing data if in Edit Mode
+  useEffect(() => {
+    if (isEditMode) {
+      const fetchListing = async () => {
+        try {
+          const event = await api.events.get(id);
+          if (event) {
+            setFormData({
+              title: event.title,
+              description: event.description || '',
+              city: event.city || '',
+              priceDollars: (event.priceCents / 100).toFixed(2),
+              currency: event.currency,
+              startTime: event.startTime || '',
+              maxParticipants: event.maxParticipants?.toString() || '',
+              images: event.images || [],
+              itinerary: event.itinerary || []
+            });
+          }
+        } catch (error) {
+          toast.error("Failed to load listing details.");
+          navigate('/dashboard');
+        }
+      };
+      fetchListing();
+    }
+  }, [isEditMode, id, navigate]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -37,30 +68,37 @@ export const CreateListing = () => {
       // Convert price to cents for API
       const priceCents = Math.round(parseFloat(formData.priceDollars) * 100);
       
+      // Mock API call - in real app, distinguish between create (POST) and update (PATCH)
       await api.events.create({
         ...formData,
         price_cents: priceCents,
         max_participants: Number(formData.maxParticipants),
-        images: ['https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80']
+        images: ['https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80'] // Mock image
       });
-      toast.success('Listing created successfully!');
+      
+      toast.success(isEditMode ? 'Listing updated successfully!' : 'Listing created successfully!');
       navigate('/dashboard');
     } catch (error) {
-      toast.error('Failed to create listing');
+      toast.error(isEditMode ? 'Failed to update listing' : 'Failed to create listing');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-12 transition-colors duration-300">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Create a New Listing</h1>
-          <p className="text-gray-600">Share your expertise with the world.</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            {isEditMode ? 'Edit Listing' : 'Create a New Listing'}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            {isEditMode ? 'Update your experience details.' : 'Share your expertise with the world.'}
+          </p>
         </div>
 
-        <ThreeDCard className="rounded-xl bg-white p-8 shadow-sm ring-1 ring-gray-900/5" depth={5}>
+        {/* Disable tilt on forms */}
+        <ThreeDCard className="rounded-xl bg-white dark:bg-gray-900 p-8 shadow-sm ring-1 ring-gray-900/5 dark:ring-white/10" depth={5} enableTilt={false}>
           <form onSubmit={handleSubmit}>
             {step === 1 && (
               <div className="space-y-6">
@@ -82,7 +120,7 @@ export const CreateListing = () => {
                     id="description"
                     name="description"
                     rows={4}
-                    className="flex w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
+                    className="flex w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 dark:text-white dark:placeholder:text-gray-500"
                     placeholder="Describe the experience..."
                     value={formData.description}
                     onChange={handleChange}
@@ -146,7 +184,7 @@ export const CreateListing = () => {
             <div className="mt-8 flex justify-end pt-6">
               {step === 1 ? (
                 <Button type="submit" isLoading={isLoading}>
-                  Publish Listing
+                  {isEditMode ? 'Update Listing' : 'Publish Listing'}
                 </Button>
               ) : null}
             </div>

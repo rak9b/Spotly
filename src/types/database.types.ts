@@ -13,7 +13,7 @@ export interface Database {
         Row: {
           id: string
           email: string
-          password_hash: string | null // Not usually sent to frontend, but part of schema
+          password_hash: string | null
           role: 'tourist' | 'guide' | 'host' | 'admin'
           is_active: boolean
           created_at: string
@@ -39,10 +39,10 @@ export interface Database {
           full_name: string | null
           avatar_url: string | null
           bio: string | null
-          languages: string[] | null // JSONB
-          interests: string[] | null // JSONB
+          languages: string[] | null
+          interests: string[] | null
           city: string | null
-          location: any | null // PostGIS Geography point
+          location: any | null
           rating_avg: number
           rating_count: number
           timezone: string | null
@@ -75,7 +75,7 @@ export interface Database {
           description: string | null
           itinerary: Json | null
           city: string | null
-          location: any | null // PostGIS
+          location: any | null
           start_time: string | null
           end_time: string | null
           min_participants: number
@@ -84,7 +84,7 @@ export interface Database {
           currency: string
           status: 'draft' | 'open' | 'full' | 'cancelled' | 'completed'
           visibility: 'public' | 'private' | null
-          images: string[] | null // JSONB
+          images: string[] | null
           created_at: string
           updated_at: string
         }
@@ -162,6 +162,18 @@ export interface Database {
           kyc_hash: string | null
           submitted_at: string
           verified_at: string | null
+        }
+      }
+      notifications: {
+        Row: {
+          id: string
+          user_id: string
+          type: string
+          title: string
+          message: string
+          data: Json | null
+          is_read: boolean
+          created_at: string
         }
       }
     }
